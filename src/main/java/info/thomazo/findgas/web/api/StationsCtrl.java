@@ -1,10 +1,14 @@
 package info.thomazo.findgas.web.api;
 
+import com.github.davidmoten.geo.GeoHash;
+import com.github.davidmoten.geo.LatLong;
 import info.thomazo.findgas.web.config.ElasticConfig;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.geogrid.GeoHashGrid;
 import org.geojson.Feature;
 import org.geojson.GeoJsonObject;
 import org.geojson.Point;
@@ -30,17 +34,16 @@ public class StationsCtrl {
 
 	@RequestMapping(method = GET)
 	public List<GeoJsonObject> list(@RequestParam double n, @RequestParam double s, @RequestParam double w, @RequestParam double e, @RequestParam int z) {
-		if (z < 12) {
-			//aggregate search
-		} else {
-			//display all
-		}
 
 		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getIndexType())
 				.setQuery(QueryBuilders.boolQuery().filter(QueryBuilders.geoBoundingBoxQuery("location").topLeft(n, w).bottomRight(s, e)))
-				.setSize(1000)
+				.setSize(100)
 				.execute()
 				.actionGet();
+
+		if (res.getHits().getTotalHits() > 100) {
+			return listAggregate(n, s, w, e, z);
+		}
 
 		List<GeoJsonObject> resStations = new ArrayList<>((int) res.getHits().totalHits());
 
@@ -55,6 +58,52 @@ public class StationsCtrl {
 		});
 
 		return resStations;
+	}
+
+
+	private List<GeoJsonObject> listAggregate(double n, double s, double w, double e, int z) {
+		int zoom = z - 4;
+		if (zoom < 5) zoom = 5;
+
+		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getIndexType())
+				.setQuery(QueryBuilders.boolQuery().filter(QueryBuilders.geoBoundingBoxQuery("location").topLeft(n, w).bottomRight(s, e)))
+				.addAggregation(AggregationBuilders.geohashGrid("stations").field("location").precision(zoom))
+				.setSize(100)
+				.execute()
+				.actionGet();
+
+
+		GeoHashGrid stations = res.getAggregations().get("stations");
+		List<GeoHashGrid.Bucket> buckets = stations.getBuckets();
+		List<GeoJsonObject> resStations = new ArrayList<>(buckets.size());
+
+		for (GeoHashGrid.Bucket bucket : buckets) {
+			Feature f = new Feature();
+
+			LatLong latLong = GeoHash.decodeHash(bucket.getKeyAsString());
+			f.setGeometry(new Point(latLong.getLon(), latLong.getLat()));
+
+			f.setProperty("nb", bucket.getDocCount());
+			f.setProperty("radius", getRadiusFromGeohash(bucket.getKeyAsString()));
+
+			resStations.add(f);
+		}
+
+		return resStations;
+	}
+
+	private double getRadiusFromGeohash(String geohash) {
+		switch (geohash.length()) {
+			case 1: return 2500 / 2;
+			case 2: return 630 / 2;
+			case 3: return 78 / 2;
+			case 4: return 20 / 2;
+			case 5: return 2.4 / 2;
+			case 6: return 0.61 / 2;
+			case 7: return 0.076 / 2;
+			case 8: return 0.019 / 2;
+		}
+		return 0;
 	}
 
 	private GeoJsonObject getPoint(String location) {
