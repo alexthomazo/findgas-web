@@ -32,7 +32,7 @@ function onFeature(f, layer) {
 	if (nb) {
 		layer.bindPopup(nb + " station" + (nb > 1 ? "s" : "") + " dans cette zone.<br>Zoomez pour voir le détail");
 	} else {
-		layer.bindPopup(prop.address + "<br>" + prop.cp + " " + prop.city);
+		layer.bindPopup(prop.address + "<br>" + prop.cp + " " + prop.city + "<br><br>" + "Numéro " + prop.id);
 	}
 }
 

@@ -20,7 +20,11 @@ public class ElasticConfig {
 
 	@Value("${app.index.type:station}")
 	@Getter
-	private String indexType;
+	private String stationType;
+
+	@Value("${app.index.type:comment}")
+	@Getter
+	private String commentType;
 
 
 	@Bean(destroyMethod = "close")

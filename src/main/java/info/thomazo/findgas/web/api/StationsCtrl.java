@@ -35,7 +35,7 @@ public class StationsCtrl {
 	@RequestMapping(method = GET)
 	public List<GeoJsonObject> list(@RequestParam double n, @RequestParam double s, @RequestParam double w, @RequestParam double e, @RequestParam int z) {
 
-		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getIndexType())
+		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getStationType())
 				.setQuery(QueryBuilders.boolQuery().filter(QueryBuilders.geoBoundingBoxQuery("location").topLeft(n, w).bottomRight(s, e)))
 				.setSize(100)
 				.execute()
@@ -49,6 +49,7 @@ public class StationsCtrl {
 
 		res.getHits().forEach(h -> {
 			Feature f = new Feature();
+			f.setProperty("id", h.getId());
 			setProperty(h, f, "address");
 			setProperty(h, f, "cp");
 			setProperty(h, f, "city");
@@ -65,7 +66,7 @@ public class StationsCtrl {
 		int zoom = z - 4;
 		if (zoom < 5) zoom = 5;
 
-		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getIndexType())
+		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getStationType())
 				.setQuery(QueryBuilders.boolQuery().filter(QueryBuilders.geoBoundingBoxQuery("location").topLeft(n, w).bottomRight(s, e)))
 				.addAggregation(AggregationBuilders.geohashGrid("stations").field("location").precision(zoom))
 				.setSize(100)
