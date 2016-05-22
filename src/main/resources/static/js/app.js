@@ -26,7 +26,7 @@ function pointToLayer(feature, latlng) {
 		} else {
 			//check user filter
 			if (feature.properties.gas && feature.properties.gas.length > 0) {
-				markerOpt.fillColor = "#00FF00";
+				markerOpt.fillColor = "#00DD00";
 			} else {
 				markerOpt.fillColor = "#FF0000";
 			}
