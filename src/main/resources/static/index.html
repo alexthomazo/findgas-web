@@ -3,17 +3,64 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<title>Où trouver de l'essence</title>
+	<title>Où trouver de l'essence ?</title>
 
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<link rel="stylesheet" href="style.css" />
 
 </head>
 <body>
 
+<div id="title"><h1>Où trouver de l'essence ?</h1></div>
+
 <div id="map"></div>
 
+<div class="modal fade" id="submitModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="formComment">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Proposer une mise à jour</h4>
+			</div>
+			<div class="modal-body">
+					<div id="message"></div>
+
+					<h5>Carburants disponibles <small>(ne rien cocher si a sec) :</small></h5>
+					<div class="checkbox"><label><input type="checkbox" value="go"> Gazole</label></div>
+					<div class="checkbox"><label><input type="checkbox" value="sp95"> SP95</label></div>
+					<div class="checkbox"><label><input type="checkbox" value="sp98"> SP98</label></div>
+
+					<!--
+					<div class="form-group">
+						<label for="waiting">Temps d'attente (en min) :</label>
+						<input type="number" class="form-control" id="waiting">
+					</div>
+					-->
+
+					<div class="form-group">
+						<label for="comment">Précisions (limites, attente...) :</label>
+						<input type="text" class="form-control" id="comment" placeholder="130 caractères max" maxlength="130">
+					</div>
+
+					<div class="form-group">
+						<label for="name">Votre nom (optionnel) :</label>
+						<input type="text" class="form-control" id="name">
+					</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+				<button type="submit" id="saveBtn" class="btn btn-primary">Enregistrer</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
 <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 <script src="js/atomic.min.js"></script>
 <script src="js/app.js"></script>
 

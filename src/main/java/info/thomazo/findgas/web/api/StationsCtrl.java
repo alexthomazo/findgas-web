@@ -12,13 +12,17 @@ import org.elasticsearch.search.aggregations.bucket.geogrid.GeoHashGrid;
 import org.geojson.Feature;
 import org.geojson.GeoJsonObject;
 import org.geojson.Point;
+import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -46,6 +50,7 @@ public class StationsCtrl {
 		}
 
 		List<GeoJsonObject> resStations = new ArrayList<>((int) res.getHits().totalHits());
+		PrettyTime pt = new PrettyTime(Locale.FRANCE);
 
 		res.getHits().forEach(h -> {
 			Feature f = new Feature();
@@ -53,7 +58,16 @@ public class StationsCtrl {
 			setProperty(h, f, "address");
 			setProperty(h, f, "cp");
 			setProperty(h, f, "city");
+			setProperty(h, f, "last_name");
+			setProperty(h, f, "comment");
+			setProperty(h, f, "gas");
 			f.setGeometry(getPoint(h.getSource().get("location").toString()));
+
+			Object lastUpdate = h.getSource().get("last_update");
+			if (lastUpdate instanceof String) { //null is not an instance
+				f.setProperty("last_update", lastUpdate);
+				f.setProperty("last_ago", pt.format(Date.from(Instant.parse((String) lastUpdate))));
+			}
 
 			resStations.add(f);
 		});

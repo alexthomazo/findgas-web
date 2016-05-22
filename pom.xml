@@ -54,6 +54,16 @@
 			<artifactId>geo</artifactId>
 			<version>0.7.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.ocpsoft.prettytime</groupId>
+			<artifactId>prettytime</artifactId>
+			<version>3.2.7.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+			<artifactId>owasp-java-html-sanitizer</artifactId>
+			<version>20160422.1</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
