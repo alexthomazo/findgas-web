@@ -1,4 +1,5 @@
-var mymap = L.map('map').setView([47.9099, -2.5653], 9);
+var mymap = L.map('map', { minZoom: 5 })
+	.setView([47.9099, -2.5653], 9);
 
 L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
@@ -145,8 +146,11 @@ function updateStation(stationId) {
 }
 
 var formComment = $("#formComment");
+var saveBtn = $('#saveBtn');
 formComment.submit(function(event) {
 	event.preventDefault();
+	saveBtn.prop('disabled', true);
+
 
 	var gas = [];
 	formComment.find("input:checkbox:checked").each(function(){
@@ -158,9 +162,6 @@ formComment.submit(function(event) {
 		name: $("#name").val(),
 		gas: gas
 	};
-
-	var saveBtn = $('#saveBtn');
-	saveBtn.attr("disabled", "disabled");
 
 	function displayError() {
 		msg.addClass("alert alert-danger");
@@ -190,7 +191,9 @@ formComment.submit(function(event) {
 		displayError();
 	})
 	.always(function () {
-		saveBtn.removeAttr("disabled");
+		setTimeout(function() {
+			saveBtn.prop('disabled', false);
+		}, 1500);
 	});
 });
 
