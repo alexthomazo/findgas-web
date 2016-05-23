@@ -130,6 +130,7 @@ mymap.on('dragend', updateMap);
 mymap.on('zoomend', updateMap);
 mymap.on('locationfound', updateMap);
 mymap.on('locationerror', updateMap);
+$('#updateMap').on('click', updateMap);
 updateMap();
 
 mymap.locate({setView: true, maxZoom: 16});
