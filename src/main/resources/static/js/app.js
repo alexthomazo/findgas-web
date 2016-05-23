@@ -150,10 +150,12 @@ formComment.submit(function(event) {
 		if (data == '"ok"') {
 			msg.addClass("alert alert-success");
 			msg.text("Mise à jour enregistrée, merci :)");
+
 			setTimeout(function() {
+				updateMap();
 				$('#submitModal').modal('hide');
 			}, 1500);
-			updateMap();
+			
 		} else {
 			displayError();
 		}

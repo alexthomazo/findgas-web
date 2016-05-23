@@ -1,7 +1,9 @@
 package info.thomazo.findgas.web.api;
 
 import info.thomazo.findgas.web.config.ElasticConfig;
+import info.thomazo.findgas.web.config.IpMDCFilter;
 import info.thomazo.findgas.web.dto.Comment;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletRequest;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -44,6 +47,9 @@ public class CommentsCtrl {
 	@Autowired
 	private ElasticConfig esConfig;
 
+	@Autowired
+	private IpMDCFilter ipMDCFilter;
+
 	@RequestMapping(method = GET)
 	public List<Comment> list(@RequestParam String stationId) {
 		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getCommentType())
@@ -59,20 +65,21 @@ public class CommentsCtrl {
 	}
 
 	@RequestMapping(method = POST)
-	public String add(@RequestParam String stationId, @RequestBody Comment comment) throws Exception {
+	public String add(@RequestParam String stationId, @RequestBody Comment comment, ServletRequest request) throws Exception {
 		sanitizeComment(comment);
 		if (comment.getComment() != null && comment.getComment().length() > 130) {
 			comment.setComment(comment.getComment().substring(0, 130));
 		}
 
 		//insert comment
-		esClient.prepareIndex(esConfig.getIndexName(), esConfig.getCommentType())
+		IndexResponse idxRes = esClient.prepareIndex(esConfig.getIndexName(), esConfig.getCommentType())
 				.setSource(jsonBuilder().startObject()
 						.field("station", stationId)
 						.field("date", new Date())
 						.field("comment", comment.getComment())
 						.field("gas", comment.getGas())
 						.field("name", comment.getName())
+						.field("ip", ipMDCFilter.getIp(request))
 						.endObject())
 				.get();
 
@@ -86,8 +93,8 @@ public class CommentsCtrl {
 						.endObject())
 				.get();
 
-		logger.info("[ADDED_COMMENT] [stationId:{}] [gas={}] [name={}] [comment={}]",
-				stationId, String.join(",", comment.getGas()), comment.getName(), comment.getComment());
+		logger.info("[ADDED_COMMENT] [id:{}] [stationId:{}] [gas={}] [name={}] [comment={}]",
+				idxRes.getId(), stationId, String.join(",", comment.getGas()), comment.getName(), comment.getComment());
 
 		return "\"ok\"";
 	}
