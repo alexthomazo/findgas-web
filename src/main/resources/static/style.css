@@ -11,9 +11,17 @@ html, body, #map {
 	top: 10px;
 	right: 10px;
 	z-index: 1000;
+	color: #ffffff;
+	text-shadow: 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+	text-align: right;
 }
 
 #title h1 {
-	color: #ffffff;
-	text-shadow: 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+	margin-top: 10px;
+	margin-bottom: 0;
+}
+
+#title p {
+	margin: 0;
+	padding: 0;
 }
