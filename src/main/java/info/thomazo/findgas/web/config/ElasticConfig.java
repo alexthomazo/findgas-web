@@ -26,11 +26,20 @@ public class ElasticConfig {
 	@Getter
 	private String commentType;
 
+	@Value("${es.hosts:localhost}")
+	private String[] esHosts;
+
 
 	@Bean(destroyMethod = "close")
 	public Client esClient() throws UnknownHostException {
-		return TransportClient.builder().build()
-				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+		TransportClient client = TransportClient.builder().build();
+
+		for (String esHost : esHosts) {
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esHost), 9300));
+		}
+
+
+		return client;
 	}
 
 }
