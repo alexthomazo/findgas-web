@@ -39,6 +39,10 @@ public class StationsCtrl {
 	@RequestMapping(method = GET)
 	public List<GeoJsonObject> list(@RequestParam double n, @RequestParam double s, @RequestParam double w, @RequestParam double e, @RequestParam int z) {
 
+		if (z < 10) {
+			return listAggregate(n, s, w, e, z);
+		}
+
 		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getStationType())
 				.setQuery(QueryBuilders.boolQuery().filter(QueryBuilders.geoBoundingBoxQuery("location").topLeft(n, w).bottomRight(s, e)))
 				.setSize(100)
