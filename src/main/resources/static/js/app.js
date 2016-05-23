@@ -86,18 +86,43 @@ function updateMap() {
 
 	if (curQuery && curQuery.abort) curQuery.abort();
 
-	curQuery = atomic.get('/api/stations?n=' + bounds.getNorth() + "&s=" + bounds.getSouth()
-			+ "&w=" + bounds.getWest() + "&e=" + bounds.getEast() + "&z=" + mymap.getZoom())
-		.success(function(data) {
+	curQuery = $.get('/api/stations?n=' + bounds.getNorth() + "&s=" + bounds.getSouth()
+		+ "&w=" + bounds.getWest() + "&e=" + bounds.getEast() + "&z=" + mymap.getZoom())
+		.done(function(data) {
 			geojson.clearLayers();
 			geojson.addData(data);
 		})
-		.error(function (data, xhr) {
-			console.log(xhr.status);
+		.fail(function (xhr, status) {
+			if (status == "abort") return;
+
+			if (xhr.status == 502) {
+				showErrorModal("Maintenance en cours", "Le site est en cours de maintenance, " +
+					"merci de réessayer dans quelques instants.")
+			} else {
+				showErrorModal("Erreur", "Une erreur est survenue pendant la récupération des données, " +
+					"merci de réessayer dans quelques instants.");
+			}
 		})
-        .always(function() {
-            curQuery = undefined;
-        });
+		.always(function() {
+			curQuery = undefined;
+		});
+}
+
+function showErrorModal(title, desc) {
+	function displayMsg(elem) {
+		elem.find('.modal-title').text(title);
+		elem.find('.modal-body').text(desc);
+		elem.modal();
+	}
+
+	var $errorModal = $('#errorModal');
+	if ($errorModal.length > 0) {
+		displayMsg($errorModal);
+	} else {
+		$('#errorLoad').load('modal-error.html', function() {
+			displayMsg($('#errorModal'));
+		});
+	}
 }
 
 mymap.on('zoomstart', function() { geojson.clearLayers(); });
@@ -155,7 +180,7 @@ formComment.submit(function(event) {
 				updateMap();
 				$('#submitModal').modal('hide');
 			}, 1500);
-			
+
 		} else {
 			displayError();
 		}
