@@ -38,6 +38,11 @@ public class StationsCtrl {
 
 	@RequestMapping(method = GET)
 	public List<GeoJsonObject> list(@RequestParam double n, @RequestParam double s, @RequestParam double w, @RequestParam double e, @RequestParam int z) {
+		//limit bounds
+		if (n < -90) n = -90; if (n > 90) n = 90;
+		if (s < -90) s = -90; if (s > 90) s = 90;
+		if (w < -180) w = -180; if (w > 180) s = 180;
+		if (e < -180) e = -180; if (e > 180) e = 180;
 
 		if (z < 10) {
 			return listAggregate(n, s, w, e, z);
