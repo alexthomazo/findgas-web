@@ -29,3 +29,14 @@ html, body, #map {
 #title .btn {
 	text-shadow: none;
 }
+
+/* responsive text queries */
+@media screen and (max-width: 992px) {
+	p { font-size: 95%; }
+	h1 { font-size: 24px; }
+}
+
+@media screen and (max-width: 768px) {
+	p { font-size: 90%; }
+	h1 { font-size: 20px; }
+}
