@@ -18,11 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -35,6 +33,20 @@ public class StationsCtrl {
 
 	@Autowired
 	private ElasticConfig esConfig;
+
+	@RequestMapping(path = "/count", method = GET)
+	public Map<String, Long> count() {
+		Map<String, Long> res = new HashMap<>();
+
+		String startDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+		SearchResponse fromDay = searchFromLastUpdate(startDay);
+		res.put("fromDay", fromDay.getHits().totalHits());
+
+		SearchResponse lastHour = searchFromLastUpdate("now-1h");
+		res.put("lastHour", lastHour.getHits().totalHits());
+
+		return res;
+	}
 
 	@RequestMapping(method = GET)
 	public List<GeoJsonObject> list(@RequestParam double n, @RequestParam double s, @RequestParam double w, @RequestParam double e, @RequestParam int z) {
@@ -145,5 +157,12 @@ public class StationsCtrl {
 		if (value != null) {
 			feature.setProperty(fieldName, value);
 		}
+	}
+
+	private SearchResponse searchFromLastUpdate(String startDay) {
+		return esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getStationType())
+				.setQuery(QueryBuilders.constantScoreQuery(QueryBuilders.rangeQuery("last_update").gte(startDay)))
+				.setSize(0)
+				.execute().actionGet();
 	}
 }

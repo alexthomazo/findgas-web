@@ -6,6 +6,61 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	attribution: '<a href="about.html">A propos de ce site</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(mymap);
 
+var geojson = L.geoJson([], {
+	pointToLayer: pointToLayer,
+	onEachFeature: onFeature
+}).addTo(mymap);
+
+function initMap() {
+	mymap.on('zoomstart', function() { geojson.clearLayers(); });
+	mymap.on('dragend', updateMap);
+	mymap.on('zoomend', updateMap);
+	mymap.on('locationfound', updateMap);
+	$('#updateMap').on('click', updateMap);
+	updateMap();
+	updateMaj(true);
+
+	mymap.locate({setView: true, maxZoom: 16});
+}
+
+var curQuery;
+function updateMap() {
+	var bounds = mymap.getBounds();
+
+	if (curQuery && curQuery.abort) curQuery.abort();
+
+	curQuery = $.get('/api/stations?n=' + bounds.getNorth() + "&s=" + bounds.getSouth()
+		+ "&w=" + bounds.getWest() + "&e=" + bounds.getEast() + "&z=" + mymap.getZoom())
+		.done(function(data) {
+			geojson.clearLayers();
+			geojson.addData(data);
+		})
+		.fail(function (xhr, status) {
+			if (status == "abort") return;
+
+			if (xhr.status == 502) {
+				showErrorModal("Maintenance en cours", "Le site est en cours de maintenance, " +
+					"merci de réessayer dans quelques instants.")
+			} else {
+				showErrorModal("Erreur", "Une erreur est survenue pendant la récupération des données, " +
+					"merci de réessayer dans quelques instants.");
+			}
+		})
+		.always(function() {
+			curQuery = undefined;
+		});
+}
+
+function updateMaj(withTimeout) {
+	$.get('/api/stations/count', function(data) {
+		$('#fromDay').text(data.fromDay);
+		$('#lastHour').text(data.lastHour);
+
+		if (withTimeout) {
+			window.setTimeout(function() { updateMaj(true); }, 60000);
+		}
+	});
+}
 
 function pointToLayer(feature, latlng) {
 	var markerOpt = {
@@ -76,39 +131,6 @@ function onFeature(f, layer) {
 	}
 }
 
-var geojson = L.geoJson([], {
-	pointToLayer: pointToLayer,
-	onEachFeature: onFeature
-}).addTo(mymap);
-
-var curQuery;
-function updateMap() {
-	var bounds = mymap.getBounds();
-
-	if (curQuery && curQuery.abort) curQuery.abort();
-
-	curQuery = $.get('/api/stations?n=' + bounds.getNorth() + "&s=" + bounds.getSouth()
-		+ "&w=" + bounds.getWest() + "&e=" + bounds.getEast() + "&z=" + mymap.getZoom())
-		.done(function(data) {
-			geojson.clearLayers();
-			geojson.addData(data);
-		})
-		.fail(function (xhr, status) {
-			if (status == "abort") return;
-
-			if (xhr.status == 502) {
-				showErrorModal("Maintenance en cours", "Le site est en cours de maintenance, " +
-					"merci de réessayer dans quelques instants.")
-			} else {
-				showErrorModal("Erreur", "Une erreur est survenue pendant la récupération des données, " +
-					"merci de réessayer dans quelques instants.");
-			}
-		})
-		.always(function() {
-			curQuery = undefined;
-		});
-}
-
 function showErrorModal(title, desc) {
 	function displayMsg(elem) {
 		elem.find('.modal-title').text(title);
@@ -125,16 +147,6 @@ function showErrorModal(title, desc) {
 		});
 	}
 }
-
-mymap.on('zoomstart', function() { geojson.clearLayers(); });
-mymap.on('dragend', updateMap);
-mymap.on('zoomend', updateMap);
-mymap.on('locationfound', updateMap);
-mymap.on('locationerror', updateMap);
-$('#updateMap').on('click', updateMap);
-updateMap();
-
-mymap.locate({setView: true, maxZoom: 16});
 
 var msg = $('#message');
 var updateStationId;
@@ -180,6 +192,7 @@ formComment.submit(function(event) {
 
 			setTimeout(function() {
 				updateMap();
+				updateMaj();
 				$('#submitModal').modal('hide');
 			}, 1500);
 
@@ -205,3 +218,5 @@ function mapGas(gas) {
 	}
 	return gas;
 }
+
+initMap();
