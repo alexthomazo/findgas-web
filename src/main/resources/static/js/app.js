@@ -138,14 +138,7 @@ function showErrorModal(title, desc) {
 		elem.modal();
 	}
 
-	var $errorModal = $('#errorModal');
-	if ($errorModal.length > 0) {
-		displayMsg($errorModal);
-	} else {
-		$('#errorLoad').load('modal-error.html', function() {
-			displayMsg($('#errorModal'));
-		});
-	}
+	loadExternal('errorLoad', 'errorModal', 'modal-error.html', displayMsg);
 }
 
 var msg = $('#message');
@@ -209,6 +202,29 @@ formComment.submit(function(event) {
 		}, 1500);
 	});
 });
+
+
+function patchStation(stationId) {
+	function fillForm(elem) {
+		elem.modal();
+	}
+
+	updateStationId = stationId;
+	loadExternal('patchLoad', 'patchModal', 'modal-patch.html', fillForm);
+}
+$('#addStation').on('click', patchStation);
+
+
+function loadExternal(injectId, injectedId, file, cb) {
+	var modal = $('#' + injectedId);
+	if (modal.length > 0) {
+		cb(modal);
+	} else {
+		$('#' + injectId).load(file, function() {
+			cb($('#' + injectedId));
+		});
+	}
+}
 
 function mapGas(gas) {
 	switch (gas) {

@@ -22,13 +22,21 @@ html, body, #map {
 }
 
 #title p {
-	margin: 0;
+	margin: 0 0 2px 0;
 	padding: 0;
 }
 
 #title .btn {
 	text-shadow: none;
 }
+
+form h5 { font-weight: bold }
+
+#patchLocation { width: 40% }
+#patchSetPoint { float: right; }
+#patchAddress { margin-bottom: 3px; }
+#patchCp { width: 20% }
+#patchVille { width: 78%; float:right; }
 
 /* responsive text queries */
 @media screen and (max-width: 992px) {
