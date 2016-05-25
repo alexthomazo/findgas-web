@@ -52,6 +52,7 @@ function updateMap() {
 }
 
 function updateMaj(withTimeout) {
+	return;
 	$.get('/api/stations/count', function(data) {
 		$('#fromDay').text(data.fromDay);
 		$('#lastHour').text(data.lastHour);
