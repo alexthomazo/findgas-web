@@ -55,14 +55,14 @@
 		_paq.push(['trackPageView']);
 		_paq.push(['enableLinkTracking']);
 		(function() {
-			var u="//stats.alexlg.eu.org/";
+			var u="/stats/";
 			_paq.push(['setTrackerUrl', u+'piwik.php']);
 			_paq.push(['setSiteId', 5]);
 			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
 			g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
 		})();
 	</script>
-	<noscript><p><img src="//stats.alexlg.eu.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
+	<noscript><p><img src="/stats/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
 	<!-- End Piwik Code -->
 
 
@@ -72,7 +72,7 @@
 <div id="title">
 	<h1>Où trouver de l'essence ?</h1>
 	<p>Trouver et partager l'état des stations #penuriecarburant</p>
-	<p>Mises à jour : <span id="fromDay"></span> aujourd'hui et <span id="lastHour"></span> depuis la dernière heure</p>
+	<p>Mises à jour : <span id="fromDay"></span> aujourd'hui et <span id="lastHour"></span> durant la dernière heure</p>
 	<p>
 		<button type="button" class="btn btn-sm btn-default" id="updateMap" aria-label="Mettre à jour la carte">
 			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
