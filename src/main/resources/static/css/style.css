@@ -38,6 +38,8 @@ form h5 { font-weight: bold }
 #patchCp { width: 20% }
 #patchVille { width: 78%; float:right; }
 
+.pointer { cursor: crosshair }
+
 /* responsive text queries */
 @media screen and (max-width: 992px) {
 	p { font-size: 95%; }

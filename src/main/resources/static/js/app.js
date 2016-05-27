@@ -99,11 +99,13 @@ function onFeature(f, layer) {
 	if (nb) {
 		layer.bindPopup(nb + " station" + (nb > 1 ? "s" : "") + " dans cette zone.<br>Zoomer pour voir le détail");
 	} else {
-		var popup = prop.address + "<br>" + prop.cp + " " + prop.city + "<br>";
+		var popup = "<div class=\"pull-right\"><button onclick=\"patchStation('" + prop.id + "')\"><span class=\"glyphicon glyphicon-pencil\"></span></button></div>";
+
+		popup += prop.address + "<br>" + prop.cp + " " + prop.city + "<br>";
 
 		//gaz if station updated
 		if (prop.gas && prop.gas.length > 0) {
-			popup += "<br><b>Carburants disponibles</b> :<ul>"
+			popup += "<br><b>Carburants disponibles</b> :<ul>";
 			for (var i = 0; i < prop.gas.length; i++) {
 				popup += "<li>" + mapGas(prop.gas[i]) + "</li>";
 			}
@@ -207,22 +209,26 @@ formComment.submit(function(event) {
 
 function patchStation(stationId) {
 	function fillForm(elem) {
-		elem.modal();
+		patch.start(elem, stationId);
 	}
 
-	updateStationId = stationId;
-	loadExternal('patchLoad', 'patchModal', 'modal-patch.html', fillForm);
+	loadExternal('patchLoad', 'patchModal', 'modal-patch.html', fillForm, 'patch.js');
 }
-$('#addStation').on('click', patchStation);
+$('#addStation').on('click', function (e) { e.preventDefault(); patchStation(); });
 
 
-function loadExternal(injectId, injectedId, file, cb) {
+function loadExternal(injectId, injectedId, file, cb, jsFile) {
 	var modal = $('#' + injectedId);
 	if (modal.length > 0) {
 		cb(modal);
 	} else {
 		$('#' + injectId).load(file, function() {
-			cb($('#' + injectedId));
+			modal = $('#' + injectedId);
+			if (jsFile) {
+				$.getScript('js/' + jsFile, function () { cb(modal); })
+			} else {
+				cb(modal);
+			}
 		});
 	}
 }

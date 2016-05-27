@@ -18,13 +18,17 @@ public class ElasticConfig {
 	@Getter
 	private String indexName;
 
-	@Value("${app.index.type:station}")
+	@Value("${app.index.type.station:station}")
 	@Getter
 	private String stationType;
 
-	@Value("${app.index.type:comment}")
+	@Value("${app.index.type.comment:comment}")
 	@Getter
 	private String commentType;
+
+	@Value("${app.index.type.patch:patch}")
+	@Getter
+	private String patchType;
 
 	@Value("${es.hosts:localhost}")
 	private String[] esHosts;

@@ -3,6 +3,7 @@ package info.thomazo.findgas.web.api;
 import com.github.davidmoten.geo.GeoHash;
 import com.github.davidmoten.geo.LatLong;
 import info.thomazo.findgas.web.config.ElasticConfig;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -14,6 +15,7 @@ import org.geojson.GeoJsonObject;
 import org.geojson.Point;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -94,6 +96,23 @@ public class StationsCtrl {
 		});
 
 		return resStations;
+	}
+
+	@RequestMapping(value = "/{id}", method = GET)
+	private Map<String, Object> get(@PathVariable String id) {
+		GetResponse res = esClient.prepareGet(esConfig.getIndexName(), esConfig.getStationType(), id)
+				.get();
+
+		Map<String, Object> station = new HashMap<>();
+
+		Map<String, Object> source = res.getSource();
+		station.put("name", source.get("name"));
+		station.put("location", source.get("location"));
+		station.put("address", source.get("address"));
+		station.put("cp", source.get("cp"));
+		station.put("city", source.get("city"));
+
+		return station;
 	}
 
 

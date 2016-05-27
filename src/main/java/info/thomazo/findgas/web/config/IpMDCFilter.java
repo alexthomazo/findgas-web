@@ -33,6 +33,16 @@ public class IpMDCFilter implements Filter {
 		return request.getRemoteHost();
 	}
 
+	public String getIpV4(ServletRequest request) {
+		String ip = getIp(request);
+		if (ip.contains(".")) {
+			return ip;
+		} else {
+			//ipv6, discard
+			return null;
+		}
+	}
+
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 	}
