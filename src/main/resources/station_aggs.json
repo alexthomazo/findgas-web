@@ -1,0 +1,43 @@
+{
+  "size": 0,
+  "query" : {
+	"bool" : {
+	  "filter" : {
+		"geo_bbox" : {
+		  "location" : {
+			"top_left" : [ -2.1416473388, 48.363092678 ],
+			"bottom_right" : [ -0.82328796, 47.9692379 ]
+		  }
+		}
+	  }
+	}
+  },
+  "aggs": {
+	"stations": {
+	  "geohash_grid": {
+		"field": "location",
+		"precision": 7
+	  },
+	  "aggs": {
+		"modified": {
+		  "date_range": {
+			"field": "last_update",
+			"ranges": [
+			  { "to": "now-1d/d" },
+			  { "from": "now-1d/d", "to": "now/d" },
+			  { "from": "now/d" }
+			]
+		  },
+		  "aggs": {
+			"gas": {
+			  "terms": {
+				"field": "gas",
+				"size": 3
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+}

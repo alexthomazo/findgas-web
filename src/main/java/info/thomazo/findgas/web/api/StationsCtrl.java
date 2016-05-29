@@ -124,7 +124,7 @@ public class StationsCtrl {
 		SearchResponse res = esClient.prepareSearch(esConfig.getIndexName()).setTypes(esConfig.getStationType())
 				.setQuery(QueryBuilders.boolQuery().filter(QueryBuilders.geoBoundingBoxQuery("location").topLeft(n, w).bottomRight(s, e)))
 				.addAggregation(AggregationBuilders.geohashGrid("stations").field("location").precision(zoom))
-				.setSize(100)
+				.setSize(0)
 				.execute()
 				.actionGet();
 
