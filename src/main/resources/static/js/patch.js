@@ -98,7 +98,7 @@ var patch = {
 		mymap.off('click', patch.clickSetPoint);
 		$('#map').removeClass('pointer');
 		$('#patchLocation').val(e.latlng.lat + "," + e.latlng.lng);
-		$.get('http://api-adresse.data.gouv.fr/reverse/', {lat: e.latlng.lat, lng: e.latlng.lng}, function(res) {
+		$.get('//api-adresse.data.gouv.fr/reverse/', {lat: e.latlng.lat, lng: e.latlng.lng}, function(res) {
 			if (res.features && res.features.length && res.features.length > 0) {
 				var address = res.features[0].properties;
 				$('#patchAddress').val(address.name);
