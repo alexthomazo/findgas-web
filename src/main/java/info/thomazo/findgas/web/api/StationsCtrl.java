@@ -78,6 +78,7 @@ public class StationsCtrl {
 		res.getHits().forEach(h -> {
 			Feature f = new Feature();
 			f.setProperty("id", h.getId());
+			setProperty(h, f, "name");
 			setProperty(h, f, "address");
 			setProperty(h, f, "cp");
 			setProperty(h, f, "city");

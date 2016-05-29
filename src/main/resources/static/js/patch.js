@@ -26,6 +26,9 @@ var patch = {
 	},
 
 	fillForm: function(station) {
+		$('#patchMsg').removeClass().text("");
+		$('#patchComment').val("");
+
 		$('#patchStName').val(station.name);
 		$('#patchLocation').val(station.location);
 		$('#patchAddress').val(station.address);
@@ -39,7 +42,7 @@ var patch = {
 		saveBtn.prop('disabled', true);
 		
 		var form = {
-			stationId: patch.stationId,
+			station: patch.stationId,
 			stationName: $('#patchStName').val(),
 			location: $('#patchLocation').val(),
 			address: $('#patchAddress').val(),
@@ -50,7 +53,7 @@ var patch = {
 		};
 
 		function displayError(err) {
-			patch.showMsg("Une erreur est survenue lors de l'enregistrement, " + err, "alert-danger")
+			patch.showMsg(err, "alert-danger")
 		}
 
 		$.post({
@@ -80,9 +83,7 @@ var patch = {
 	},
 
 	showMsg: function(msg, background) {
-		var pMsg = $('#patchMsg');
-		pMsg.addClass("alert " + background);
-		pMsg.text(msg);
+		$('#patchMsg').addClass("alert " + background).text(msg);
 	},
 
 	startSetPoint: function(e) {

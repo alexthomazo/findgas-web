@@ -101,6 +101,8 @@ function onFeature(f, layer) {
 	} else {
 		var popup = "<div class=\"pull-right\"><button onclick=\"patchStation('" + prop.id + "')\"><span class=\"glyphicon glyphicon-pencil\"></span></button></div>";
 
+		if (prop.name) popup += "<b>" + prop.name + "</b><br>";
+
 		popup += prop.address + "<br>" + prop.cp + " " + prop.city + "<br>";
 
 		//gaz if station updated

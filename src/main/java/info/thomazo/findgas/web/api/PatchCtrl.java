@@ -3,6 +3,7 @@ package info.thomazo.findgas.web.api;
 import info.thomazo.findgas.web.config.ElasticConfig;
 import info.thomazo.findgas.web.config.IpMDCFilter;
 import info.thomazo.findgas.web.dto.Patch;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -45,7 +46,6 @@ public class PatchCtrl {
 		}
 		String location = normalizeLocation(patch.getLocation());
 		if (location == null || location.isEmpty()) return "La localisation est invalide";
-		if (patch.getStationName() == null || patch.getStationName().isEmpty()) return "Le nom de la station est obligatoire";
 
 		IndexResponse idxRes = esClient.prepareIndex(esConfig.getIndexName(), esConfig.getPatchType())
 			.setSource(jsonBuilder().startObject()
@@ -71,6 +71,7 @@ public class PatchCtrl {
 
 	private String normalizeLocation(String location) {
 		if (location == null) return null;
+		location = StringUtils.replaceChars(location, " ", "");
 		int pos = location.indexOf(',');
 
 		if (pos == -1) {
